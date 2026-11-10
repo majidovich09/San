@@ -22,6 +22,16 @@ export interface UserInputData {
   graduationAgeCategory: GraduationAgeCategory;
 }
 
+export interface RegionalChance {
+  id: string;
+  name: string;
+  chancePercentage: number;
+  demandLevel: string;
+  relativeThreshold: number;
+  advice: string;
+  badgeClass: string;
+}
+
 export interface ScoreBreakdown {
   bacPoints: number;
   licensePoints: number;
@@ -34,6 +44,7 @@ export interface ScoreBreakdown {
   chancePercentage: number;
   chanceTier: 'guaranteed' | 'high' | 'moderate' | 'low';
   strategicTips: string[];
+  regionalRankings?: RegionalChance[];
 }
 
 export interface ChatMessage {
@@ -66,4 +77,23 @@ export interface CandidateRecord {
   differenceFromThreshold: number;
   chancePercentage: number;
   timestamp: string;
+}
+
+export interface QCMQuestion {
+  id: number;
+  question: string;
+  options: string[];
+  correctIndex: number;
+  category: string;
+  explanation: string;
+  sourceExam?: string;
+}
+
+export interface QCMQuizResult {
+  totalQuestions: number;
+  correctAnswers: number;
+  scorePercentage: number;
+  answers: Record<number, number>;
+  questions: QCMQuestion[];
+  timeTakenSeconds: number;
 }

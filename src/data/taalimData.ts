@@ -4,6 +4,7 @@ import {
   LicenseMention,
   GraduationAgeCategory,
   ScoreBreakdown,
+  RegionalChance,
 } from '../types';
 
 export const BAC_POINTS: Record<BacMention, { label: string; points: number }> = {
@@ -357,6 +358,8 @@ export function calculateExactScore(
     graduationAgeCategory
   );
 
+  const regionalRankings = calculateRegionalRankings(totalScore, specialty);
+
   return {
     bacPoints,
     licensePoints,
@@ -369,7 +372,155 @@ export function calculateExactScore(
     chancePercentage,
     chanceTier,
     strategicTips,
+    regionalRankings,
   };
+}
+
+/**
+ * Calculates candidate chances across all 12 Moroccan Regional Academies (AREFs)
+ * and returns them ranked from HIGHEST chance percentage to LOWEST.
+ */
+export function calculateRegionalRankings(
+  totalScore: number,
+  specialty: Specialty
+): RegionalChance[] {
+  const refThreshold = specialty.referenceThreshold;
+
+  // Regional profiles with threshold adjustments and characteristics
+  const regionsConfig = [
+    {
+      id: 'draa',
+      name: 'أكاديمية جهة درعة تافيلالت',
+      thresholdAdjustment: -20,
+      demandLevel: 'خصاص استثنائي (الفرصة رقم 1)',
+      advice: 'أعلى نسبة قبول وطنية؛ خصاص هائل في ورزازات، زاكورة، تنغير، والرشيدية.',
+      badgeClass: 'bg-emerald-100 text-emerald-800',
+    },
+    {
+      id: 'benimellal',
+      name: 'أكاديمية جهة بني ملال خنيفرة',
+      thresholdAdjustment: -16,
+      demandLevel: 'خصاص مرتفع جداً ومقاعد وافرة',
+      advice: 'عتبات مرنة بأقاليم أزيلال، خنيفرة، الفقيه بن صالح، وبني ملال القروية.',
+      badgeClass: 'bg-emerald-100 text-emerald-800',
+    },
+    {
+      id: 'dakhla',
+      name: 'أكاديمية جهة الداخلة وادي الذهب',
+      thresholdAdjustment: -18,
+      demandLevel: 'عتبات منخفضة جداً (قبول شبه مباشر)',
+      advice: 'حظوظ قياسية تفوق 98% لكافة المستوفين للشروط الأكاديمية.',
+      badgeClass: 'bg-teal-100 text-teal-800',
+    },
+    {
+      id: 'laayoune',
+      name: 'أكاديمية جهة العيون الساقية الحمراء',
+      thresholdAdjustment: -15,
+      demandLevel: 'عتبات ميسرة وخصاص',
+      advice: 'فرص واسعة للاجتياز المباشر بالعيون، بوجدور، والسمارة.',
+      badgeClass: 'bg-teal-100 text-teal-800',
+    },
+    {
+      id: 'guelmim',
+      name: 'أكاديمية جهة كلميم واد نون',
+      thresholdAdjustment: -14,
+      demandLevel: 'عتبات منخفضة وتسهيلات',
+      advice: 'عتبات ميسرة جداً بأقاليم أسا الزاك، طانطان، وسيدي إفني.',
+      badgeClass: 'bg-teal-100 text-teal-800',
+    },
+    {
+      id: 'oriental',
+      name: 'أكاديمية جهة الشرق',
+      thresholdAdjustment: -12,
+      demandLevel: 'خصاص ملحوظ بالأقاليم',
+      advice: 'فرص ممتازة بمديريات فكيك، الدريوش، جرسيف، وتاوريرت.',
+      badgeClass: 'bg-emerald-100 text-emerald-800',
+    },
+    {
+      id: 'fes',
+      name: 'أكاديمية جهة فاس مكناس',
+      thresholdAdjustment: -10,
+      demandLevel: 'عتبات ميسرة بالأقاليم القروية',
+      advice: 'مديريات بولمان، تاونات، وإفران تسجل عتبات أدنى بكثير من الحواضر الكبرى.',
+      badgeClass: 'bg-blue-100 text-blue-800',
+    },
+    {
+      id: 'souss',
+      name: 'أكاديمية جهة سوس ماسة',
+      thresholdAdjustment: -8,
+      demandLevel: 'تنافسية متوسطة إلى مرتفعة',
+      advice: 'تارودانت، طاطا، وتزنيت تضمن عتبات أقل بوضوح من أكادير إداوتنان.',
+      badgeClass: 'bg-blue-100 text-blue-800',
+    },
+    {
+      id: 'tanger',
+      name: 'أكاديمية جهة طنجة تطوان الحسيمة',
+      thresholdAdjustment: -7,
+      demandLevel: 'مناصب وافرة بالمناطق الجبلية',
+      advice: 'مديريات وزان، شفشاون، وتارجيست والحسيمة خيارات ممتازة لتفادي عتبات طنجة.',
+      badgeClass: 'bg-blue-100 text-blue-800',
+    },
+    {
+      id: 'marrakech',
+      name: 'أكاديمية جهة مراكش آسفي',
+      thresholdAdjustment: -6,
+      demandLevel: 'تنافسية عالية بالمدينة / مرنة بالأقاليم',
+      advice: 'الحوز، شيشاوة، الصويرة، واليوسفية تتيح عتبات أكثر مرونة بكثير من مراكش المركز.',
+      badgeClass: 'bg-blue-100 text-blue-800',
+    },
+    {
+      id: 'rabat',
+      name: 'أكاديمية جهة الرباط سلا القنيطرة',
+      thresholdAdjustment: -2,
+      demandLevel: 'تنافسية شديدة بالمدن المركزية',
+      advice: 'عتبات مرتفعة بالرباط وسلا؛ يُفضل التوجه لمديريات الخميسات، سيدي قاسم وسيدي سليمان.',
+      badgeClass: 'bg-amber-100 text-amber-800',
+    },
+    {
+      id: 'casa',
+      name: 'أكاديمية جهة الدار البيضاء سطات',
+      thresholdAdjustment: 0,
+      demandLevel: 'أعلى تنافسية وطنية',
+      advice: 'أعلى عتبات بالقطب الحضري؛ ينصح ذوو النقاط المتوسطة باختيار سطات أو بنسليمان أو سيدي بنور.',
+      badgeClass: 'bg-amber-100 text-amber-800',
+    },
+  ];
+
+  const results: RegionalChance[] = regionsConfig.map((reg) => {
+    let regionalChance: number;
+    const effectiveThreshold = Math.max(0, refThreshold + reg.thresholdAdjustment);
+
+    if (refThreshold === 0) {
+      regionalChance = 99;
+    } else if (totalScore >= effectiveThreshold) {
+      const surplus = totalScore - effectiveThreshold;
+      regionalChance = Math.min(99, Math.round(86 + Math.min(13, surplus * 0.9)));
+    } else {
+      const deficit = effectiveThreshold - totalScore;
+      if (deficit <= 5) {
+        regionalChance = Math.round(82 - deficit * 1.5);
+      } else if (deficit <= 15) {
+        regionalChance = Math.round(75 - ((deficit - 5) / 10) * 20);
+      } else if (deficit <= 25) {
+        regionalChance = Math.round(55 - ((deficit - 15) / 10) * 20);
+      } else {
+        regionalChance = Math.max(15, Math.round(35 - (deficit - 25) * 0.8));
+      }
+    }
+
+    return {
+      id: reg.id,
+      name: reg.name,
+      chancePercentage: regionalChance,
+      demandLevel: reg.demandLevel,
+      relativeThreshold: effectiveThreshold,
+      advice: reg.advice,
+      badgeClass: reg.badgeClass,
+    };
+  });
+
+  // Sort strictly from HIGHEST chance percentage to LOWEST!
+  return results.sort((a, b) => b.chancePercentage - a.chancePercentage);
 }
 
 /**

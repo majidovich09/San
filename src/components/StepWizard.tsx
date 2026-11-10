@@ -6,6 +6,7 @@ import {
   LicenseMention,
   GraduationAgeCategory,
   ScoreBreakdown,
+  RegionalChance,
 } from '../types';
 import {
   SPECIALTIES,
@@ -31,16 +32,24 @@ import {
   Compass,
   Info,
   ChevronLeft,
+  BookOpen,
+  MapPin,
+  TrendingUp,
 } from 'lucide-react';
 
 interface StepWizardProps {
   onOpenRegions: () => void;
   onOpenRubric: () => void;
+  onStartExam: () => void;
 }
 
 type WizardStep = 'welcome' | 'name' | 'specialty' | 'bac' | 'license' | 'age' | 'result';
 
-export const StepWizard: React.FC<StepWizardProps> = ({ onOpenRegions, onOpenRubric }) => {
+export const StepWizard: React.FC<StepWizardProps> = ({
+  onOpenRegions,
+  onOpenRubric,
+  onStartExam,
+}) => {
   const [currentStep, setCurrentStep] = useState<WizardStep>('welcome');
   const [candidateName, setCandidateName] = useState<string>('');
   const [selectedCycle, setSelectedCycle] = useState<EducationCycle | 'all'>('all');
@@ -54,7 +63,7 @@ export const StepWizard: React.FC<StepWizardProps> = ({ onOpenRegions, onOpenRub
   const stepOrder: WizardStep[] = ['name', 'specialty', 'bac', 'license', 'age'];
   const stepIndex = stepOrder.indexOf(currentStep);
 
-  const handleStart = () => {
+  const handleStartCalculator = () => {
     setCurrentStep('name');
   };
 
@@ -112,51 +121,91 @@ export const StepWizard: React.FC<StepWizardProps> = ({ onOpenRegions, onOpenRub
       : SPECIALTIES.filter((s) => s.cycle === selectedCycle);
 
   return (
-    <div className="w-full max-w-2xl mx-auto">
-      {/* -------------------- STEP 0: WELCOME SCREEN -------------------- */}
+    <div className="w-full max-w-3xl mx-auto">
+      {/* -------------------- STEP 0: WELCOME SCREEN (WITH 2 OPTIONS) -------------------- */}
       {currentStep === 'welcome' && (
-        <div className="bg-white rounded-3xl border border-slate-200/80 p-8 sm:p-12 text-center shadow-lg shadow-slate-200/40 relative overflow-hidden">
-          {/* Subtle Top Accent */}
+        <div className="bg-white rounded-3xl border border-slate-200/80 p-6 sm:p-10 text-center shadow-lg shadow-slate-200/40 relative overflow-hidden">
+          {/* Top Accent Gradient */}
           <div className="absolute top-0 left-0 right-0 h-2 bg-gradient-to-r from-emerald-600 via-teal-500 to-emerald-700" />
 
           {/* Icon Badge */}
-          <div className="w-20 h-20 mx-auto rounded-3xl bg-emerald-50 border border-emerald-100 flex items-center justify-center text-emerald-700 shadow-inner mb-6">
+          <div className="w-20 h-20 mx-auto rounded-3xl bg-emerald-50 border border-emerald-100 flex items-center justify-center text-emerald-700 shadow-inner mb-5">
             <GraduationCap className="w-10 h-10" />
           </div>
 
-          <span className="text-xs font-bold text-emerald-700 uppercase tracking-wider block mb-2">
-            مباراة التعليم بالمغرب · دورة 2026
+          <span className="text-xs font-bold text-emerald-800 uppercase tracking-wider block mb-1">
+            بوابة مباراة التعليم بالمغرب · دورة 2026
           </span>
 
-          <h1 className="text-2xl sm:text-3xl md:text-4xl font-black text-slate-900 mb-4 leading-tight">
-            حاسبة حظوظ الانتقاء الأولي
+          <h1 className="text-2xl sm:text-3xl md:text-4xl font-black text-slate-900 mb-3 leading-tight">
+            مرحباً بك! اختر ما ترغب في إجرائه اليوم:
           </h1>
 
-          <p className="text-sm sm:text-base text-slate-600 max-w-lg mx-auto mb-8 leading-relaxed">
-            احسب مجموع نقاطك الدقيق من <strong className="text-slate-900 font-bold">80 نقطة</strong> وفق الشبكة الرسمية لوزارة التربية الوطنية، واكتشف نسبة حظوظك المقدرة مقارنة بالعتبات المرجعية خطوة بخطوة.
+          <p className="text-xs sm:text-sm text-slate-600 max-w-lg mx-auto mb-8 leading-relaxed">
+            منصة متكاملة تجمع بين حساب حظوظ الانتقاء الأولي وترتيب الأكاديميات، وبين التدريب المكثف على اختبارات علوم التربية الرسمية.
           </p>
 
-          {/* Start CTA Button */}
-          <button
-            onClick={handleStart}
-            className="w-full sm:w-auto px-10 py-4 bg-emerald-700 hover:bg-emerald-800 active:scale-98 text-white rounded-2xl font-bold text-base sm:text-lg shadow-md shadow-emerald-700/20 transition-all flex items-center justify-center gap-3 mx-auto cursor-pointer"
-          >
-            <span>ابدأ الحساب الآن</span>
-            <ChevronLeft className="w-5 h-5" />
-          </button>
+          {/* TWO PRIMARY CHOICES AS REQUESTED BY USER */}
+          <div className="grid grid-cols-1 sm:grid-cols-2 gap-4 mb-8 text-right">
+            {/* Option 1: Calculator */}
+            <div
+              onClick={handleStartCalculator}
+              className="p-6 rounded-3xl border-2 border-emerald-600/60 bg-emerald-50/40 hover:bg-emerald-50 hover:border-emerald-700 transition-all cursor-pointer shadow-sm hover:shadow-md flex flex-col justify-between group"
+            >
+              <div>
+                <div className="w-12 h-12 rounded-2xl bg-emerald-700 text-white flex items-center justify-center mb-4 group-hover:scale-105 transition-transform shadow-xs">
+                  <GraduationCap className="w-6 h-6" />
+                </div>
+                <h3 className="text-lg font-bold text-slate-900 mb-1 group-hover:text-emerald-800 transition-colors">
+                  1. معرفة نسبة حظوظ الانتقاء الأولي
+                </h3>
+                <p className="text-xs text-slate-600 leading-relaxed mb-4">
+                  حساب مجموعك على 80 نقطة، مقارنته بالعتبات المرجعية، وعرض <strong className="text-slate-900">ترتيب الجهات من الأعلى للأدنى</strong>.
+                </p>
+              </div>
+
+              <div className="flex items-center text-xs font-bold text-emerald-700 pt-2 border-t border-emerald-200/60">
+                <span>ابدأ حساب الحظوظ</span>
+                <ChevronLeft className="w-4 h-4 mr-1 group-hover:-translate-x-1 transition-transform" />
+              </div>
+            </div>
+
+            {/* Option 2: Education Sciences Exam */}
+            <div
+              onClick={onStartExam}
+              className="p-6 rounded-3xl border-2 border-blue-500/50 bg-blue-50/40 hover:bg-blue-50 hover:border-blue-600 transition-all cursor-pointer shadow-sm hover:shadow-md flex flex-col justify-between group"
+            >
+              <div>
+                <div className="w-12 h-12 rounded-2xl bg-blue-700 text-white flex items-center justify-center mb-4 group-hover:scale-105 transition-transform shadow-xs">
+                  <BookOpen className="w-6 h-6" />
+                </div>
+                <h3 className="text-lg font-bold text-slate-900 mb-1 group-hover:text-blue-800 transition-colors">
+                  2. امتحان تجريبي في علوم التربية (QCM)
+                </h3>
+                <p className="text-xs text-slate-600 leading-relaxed mb-4">
+                  أسئلة حقيقية من مباريات سابقة ومراجع رسمية (10 إلى 100 سؤال) مع <strong className="text-slate-900">النسبة وتصحيح مفصل للأخطاء</strong>.
+                </p>
+              </div>
+
+              <div className="flex items-center text-xs font-bold text-blue-700 pt-2 border-t border-blue-200/60">
+                <span>ابدأ اختبار علوم التربية</span>
+                <ChevronLeft className="w-4 h-4 mr-1 group-hover:-translate-x-1 transition-transform" />
+              </div>
+            </div>
+          </div>
 
           {/* Quick reference note */}
-          <div className="mt-10 pt-6 border-t border-slate-100 flex flex-wrap items-center justify-center gap-6 text-xs text-slate-500">
+          <div className="pt-6 border-t border-slate-100 flex flex-wrap items-center justify-center gap-6 text-xs text-slate-500">
             <span>✓ شبكة رسمية معتمدة (80 نقطة)</span>
             <span>·</span>
-            <span>✓ عتبات مرجعية محينة</span>
+            <span>✓ ترتيب الأكاديميات الـ 12</span>
             <span>·</span>
-            <span>✓ نتائج وتوجيهات فورية</span>
+            <span>✓ بنك أسئلة رسمي مصحح</span>
           </div>
         </div>
       )}
 
-      {/* -------------------- PROGRESS HEADER (For Steps 1-5) -------------------- */}
+      {/* -------------------- PROGRESS HEADER (For Calculator Steps 1-5) -------------------- */}
       {currentStep !== 'welcome' && currentStep !== 'result' && (
         <div className="mb-6">
           <div className="flex items-center justify-between text-xs font-semibold text-slate-600 mb-2 px-1">
@@ -191,7 +240,7 @@ export const StepWizard: React.FC<StepWizardProps> = ({ onOpenRegions, onOpenRub
             ما اسمك الكريم؟
           </h2>
           <p className="text-xs sm:text-sm text-slate-600 mb-6">
-            أدخل اسمك لتخصيص تقرير حظوظ الانتقاء والبطاقة الرسمية للنتائج.
+            أدخل اسمك لتخصيص تقرير حظوظ الانتقاء والترتيب الجهوي.
           </p>
 
           <form onSubmit={handleNextFromName}>
@@ -214,17 +263,17 @@ export const StepWizard: React.FC<StepWizardProps> = ({ onOpenRegions, onOpenRub
               <button
                 type="button"
                 onClick={() => setCurrentStep('welcome')}
-                className="px-5 py-3 text-slate-600 hover:text-slate-900 font-semibold text-sm rounded-xl hover:bg-slate-100 transition-colors flex items-center gap-1.5"
+                className="px-5 py-3 text-slate-600 hover:text-slate-900 font-semibold text-sm rounded-xl hover:bg-slate-100 transition-colors flex items-center gap-1.5 cursor-pointer"
               >
                 <ArrowRight className="w-4 h-4" />
-                <span>رجوع</span>
+                <span>رجوع للرئيسية</span>
               </button>
 
               <button
                 type="submit"
                 className="px-8 py-3.5 bg-emerald-700 hover:bg-emerald-800 text-white rounded-xl font-bold text-sm shadow-sm transition-all flex items-center gap-2 cursor-pointer"
               >
-                <span>التالي</span>
+                <span>التالي: اختيار التخصص</span>
                 <ChevronLeft className="w-4 h-4" />
               </button>
             </div>
@@ -243,7 +292,7 @@ export const StepWizard: React.FC<StepWizardProps> = ({ onOpenRegions, onOpenRub
             اختر السلك والتخصص المطلوب
           </h2>
           <p className="text-xs sm:text-sm text-slate-600 mb-4">
-            حدد التخصص الذي ترغب في الترشح له لمعرفة عتبته المرجعية المعتمدة.
+            حدد التخصص المطلوب لاحتساب العتبة المرجعية والترتيب الجهوي.
           </p>
 
           {/* Filter tabs by cycle */}
@@ -251,7 +300,7 @@ export const StepWizard: React.FC<StepWizardProps> = ({ onOpenRegions, onOpenRub
             <button
               type="button"
               onClick={() => setSelectedCycle('all')}
-              className={`px-3 py-1.5 rounded-lg whitespace-nowrap transition-colors ${
+              className={`px-3 py-1.5 rounded-lg whitespace-nowrap transition-colors cursor-pointer ${
                 selectedCycle === 'all'
                   ? 'bg-white text-slate-900 shadow-xs'
                   : 'text-slate-600 hover:text-slate-900'
@@ -262,7 +311,7 @@ export const StepWizard: React.FC<StepWizardProps> = ({ onOpenRegions, onOpenRub
             <button
               type="button"
               onClick={() => setSelectedCycle('primary')}
-              className={`px-3 py-1.5 rounded-lg whitespace-nowrap transition-colors ${
+              className={`px-3 py-1.5 rounded-lg whitespace-nowrap transition-colors cursor-pointer ${
                 selectedCycle === 'primary'
                   ? 'bg-white text-slate-900 shadow-xs'
                   : 'text-slate-600 hover:text-slate-900'
@@ -273,7 +322,7 @@ export const StepWizard: React.FC<StepWizardProps> = ({ onOpenRegions, onOpenRub
             <button
               type="button"
               onClick={() => setSelectedCycle('middle')}
-              className={`px-3 py-1.5 rounded-lg whitespace-nowrap transition-colors ${
+              className={`px-3 py-1.5 rounded-lg whitespace-nowrap transition-colors cursor-pointer ${
                 selectedCycle === 'middle'
                   ? 'bg-white text-slate-900 shadow-xs'
                   : 'text-slate-600 hover:text-slate-900'
@@ -284,7 +333,7 @@ export const StepWizard: React.FC<StepWizardProps> = ({ onOpenRegions, onOpenRub
             <button
               type="button"
               onClick={() => setSelectedCycle('secondary')}
-              className={`px-3 py-1.5 rounded-lg whitespace-nowrap transition-colors ${
+              className={`px-3 py-1.5 rounded-lg whitespace-nowrap transition-colors cursor-pointer ${
                 selectedCycle === 'secondary'
                   ? 'bg-white text-slate-900 shadow-xs'
                   : 'text-slate-600 hover:text-slate-900'
@@ -295,7 +344,7 @@ export const StepWizard: React.FC<StepWizardProps> = ({ onOpenRegions, onOpenRub
             <button
               type="button"
               onClick={() => setSelectedCycle('common')}
-              className={`px-3 py-1.5 rounded-lg whitespace-nowrap transition-colors ${
+              className={`px-3 py-1.5 rounded-lg whitespace-nowrap transition-colors cursor-pointer ${
                 selectedCycle === 'common'
                   ? 'bg-white text-slate-900 shadow-xs'
                   : 'text-slate-600 hover:text-slate-900'
@@ -337,7 +386,7 @@ export const StepWizard: React.FC<StepWizardProps> = ({ onOpenRegions, onOpenRub
             <button
               type="button"
               onClick={() => setCurrentStep('name')}
-              className="px-5 py-3 text-slate-600 hover:text-slate-900 font-semibold text-sm rounded-xl hover:bg-slate-100 transition-colors flex items-center gap-1.5"
+              className="px-5 py-3 text-slate-600 hover:text-slate-900 font-semibold text-sm rounded-xl hover:bg-slate-100 transition-colors flex items-center gap-1.5 cursor-pointer"
             >
               <ArrowRight className="w-4 h-4" />
               <span>السابق</span>
@@ -414,7 +463,7 @@ export const StepWizard: React.FC<StepWizardProps> = ({ onOpenRegions, onOpenRub
             <button
               type="button"
               onClick={() => setCurrentStep('specialty')}
-              className="px-5 py-3 text-slate-600 hover:text-slate-900 font-semibold text-sm rounded-xl hover:bg-slate-100 transition-colors flex items-center gap-1.5"
+              className="px-5 py-3 text-slate-600 hover:text-slate-900 font-semibold text-sm rounded-xl hover:bg-slate-100 transition-colors flex items-center gap-1.5 cursor-pointer"
             >
               <ArrowRight className="w-4 h-4" />
               <span>السابق</span>
@@ -492,7 +541,7 @@ export const StepWizard: React.FC<StepWizardProps> = ({ onOpenRegions, onOpenRub
             <button
               type="button"
               onClick={() => setCurrentStep('bac')}
-              className="px-5 py-3 text-slate-600 hover:text-slate-900 font-semibold text-sm rounded-xl hover:bg-slate-100 transition-colors flex items-center gap-1.5"
+              className="px-5 py-3 text-slate-600 hover:text-slate-900 font-semibold text-sm rounded-xl hover:bg-slate-100 transition-colors flex items-center gap-1.5 cursor-pointer"
             >
               <ArrowRight className="w-4 h-4" />
               <span>السابق</span>
@@ -575,7 +624,7 @@ export const StepWizard: React.FC<StepWizardProps> = ({ onOpenRegions, onOpenRub
             <button
               type="button"
               onClick={() => setCurrentStep('license')}
-              className="px-5 py-3 text-slate-600 hover:text-slate-900 font-semibold text-sm rounded-xl hover:bg-slate-100 transition-colors flex items-center gap-1.5"
+              className="px-5 py-3 text-slate-600 hover:text-slate-900 font-semibold text-sm rounded-xl hover:bg-slate-100 transition-colors flex items-center gap-1.5 cursor-pointer"
             >
               <ArrowRight className="w-4 h-4" />
               <span>السابق</span>
@@ -587,14 +636,14 @@ export const StepWizard: React.FC<StepWizardProps> = ({ onOpenRegions, onOpenRub
               onClick={handleCalculateResult}
               className="px-8 py-3.5 bg-emerald-700 hover:bg-emerald-800 disabled:opacity-40 disabled:hover:bg-emerald-700 text-white rounded-xl font-bold text-sm shadow-md shadow-emerald-700/20 transition-all flex items-center gap-2 cursor-pointer"
             >
-              <span>احسب النتيجة والحظوظ الآن</span>
+              <span>احسب النتيجة والترتيب الجهوي</span>
               <Sparkles className="w-4 h-4" />
             </button>
           </div>
         </div>
       )}
 
-      {/* -------------------- STEP 6: FINAL RESULT & PERCENTAGE SCREEN -------------------- */}
+      {/* -------------------- STEP 6: FINAL RESULT WITH SORTED AREF RANKINGS -------------------- */}
       {currentStep === 'result' && result && (
         <div className="space-y-6">
           {/* Header Banner with Candidate Name & Big Percentage */}
@@ -613,10 +662,10 @@ export const StepWizard: React.FC<StepWizardProps> = ({ onOpenRegions, onOpenRub
               إليك نتيجة تقييم ملفك لتخصص <strong className="text-slate-900 font-bold">{result.specialty.name}</strong>:
             </p>
 
-            {/* Big Circular/Gauged Percentage Display */}
+            {/* Big Percentage Display */}
             <div className="bg-gradient-to-b from-emerald-50/80 to-teal-50/50 rounded-3xl border border-emerald-200/70 p-6 max-w-sm mx-auto mb-8 shadow-inner">
               <span className="text-xs font-bold text-emerald-800 uppercase tracking-wider block mb-1">
-                النسبة المئوية التقديرية لحضوظك
+                النسبة المئوية التقديرية العامة للحظوظ
               </span>
               <div className="text-5xl sm:text-6xl font-black text-emerald-800 tabular-nums my-2 tracking-tight">
                 {result.chancePercentage}%
@@ -691,6 +740,87 @@ export const StepWizard: React.FC<StepWizardProps> = ({ onOpenRegions, onOpenRub
               </div>
             </div>
 
+            {/* ----------------- FEATURE: REGIONAL ACADEMIES SORTED (HIGHEST TO LOWEST) ----------------- */}
+            {result.regionalRankings && result.regionalRankings.length > 0 && (
+              <div className="bg-slate-50/80 border border-slate-200 rounded-3xl p-6 text-right mb-8">
+                <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-2 pb-3 mb-4 border-b border-slate-200">
+                  <div>
+                    <h3 className="text-base font-black text-slate-900 flex items-center gap-2">
+                      <TrendingUp className="w-5 h-5 text-emerald-700" />
+                      <span>ترتيب الأكاديميات الجهوية (AREF) حسب نسبة حظوظك</span>
+                    </h3>
+                    <p className="text-xs text-slate-500 mt-0.5">
+                      مرتبة تنازلياً من الجهة ذات الحظ الأوفر إلى الأكثر تنافسية، بناءً على حجم الخصاص الإقليمي وعتبات 2026.
+                    </p>
+                  </div>
+                  <span className="text-xs font-bold text-emerald-800 bg-emerald-100/70 px-3 py-1 rounded-xl self-start sm:self-center">
+                    مرتبة من الأعلى إلى الأسفل ↓
+                  </span>
+                </div>
+
+                <div className="space-y-3">
+                  {result.regionalRankings.map((reg, idx) => (
+                    <div
+                      key={reg.id}
+                      className="bg-white rounded-2xl border border-slate-200/90 p-4 shadow-2xs hover:border-emerald-300 transition-all text-xs"
+                    >
+                      <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-2 mb-2">
+                        <div className="flex items-center gap-2.5">
+                          <span
+                            className={`w-6 h-6 rounded-xl flex items-center justify-center font-bold text-xs ${
+                              idx < 3
+                                ? 'bg-emerald-700 text-white'
+                                : 'bg-slate-100 text-slate-700'
+                            }`}
+                          >
+                            {idx + 1}
+                          </span>
+                          <span className="font-bold text-slate-900 text-sm">
+                            {reg.name}
+                          </span>
+                        </div>
+
+                        <div className="flex items-center gap-2">
+                          <span className="text-[11px] font-semibold text-slate-500">
+                            {reg.demandLevel}
+                          </span>
+                          <span
+                            className={`px-2.5 py-1 rounded-xl font-black text-xs tabular-nums ${
+                              reg.chancePercentage >= 85
+                                ? 'bg-emerald-100 text-emerald-800 border border-emerald-200'
+                                : reg.chancePercentage >= 65
+                                ? 'bg-blue-100 text-blue-800 border border-blue-200'
+                                : 'bg-amber-100 text-amber-800 border border-amber-200'
+                            }`}
+                          >
+                            {reg.chancePercentage}%
+                          </span>
+                        </div>
+                      </div>
+
+                      {/* Mini Progress Bar */}
+                      <div className="w-full bg-slate-100 h-2 rounded-full overflow-hidden mb-2">
+                        <div
+                          className={`h-full rounded-full transition-all duration-500 ${
+                            reg.chancePercentage >= 85
+                              ? 'bg-emerald-600'
+                              : reg.chancePercentage >= 65
+                              ? 'bg-blue-600'
+                              : 'bg-amber-500'
+                          }`}
+                          style={{ width: `${reg.chancePercentage}%` }}
+                        />
+                      </div>
+
+                      <p className="text-slate-600 text-[11px] leading-relaxed mr-8">
+                        {reg.advice}
+                      </p>
+                    </div>
+                  ))}
+                </div>
+              </div>
+            )}
+
             {/* Strategic Tips */}
             <div className="bg-slate-50 border border-slate-200 rounded-2xl p-5 text-right max-w-lg mx-auto mb-8">
               <h4 className="text-sm font-bold text-slate-900 mb-3 flex items-center gap-2">
@@ -706,7 +836,7 @@ export const StepWizard: React.FC<StepWizardProps> = ({ onOpenRegions, onOpenRub
               </div>
             </div>
 
-            {/* Action Buttons: Print, Regional Guide, Restart */}
+            {/* Action Buttons: Print, Try Exam, Restart */}
             <div className="flex flex-col sm:flex-row items-center justify-center gap-3 pt-4 border-t border-slate-100">
               <button
                 type="button"
@@ -719,20 +849,20 @@ export const StepWizard: React.FC<StepWizardProps> = ({ onOpenRegions, onOpenRub
 
               <button
                 type="button"
+                onClick={onStartExam}
+                className="w-full sm:w-auto px-6 py-3 bg-blue-700 hover:bg-blue-800 text-white rounded-xl text-xs sm:text-sm font-bold transition-colors flex items-center justify-center gap-2 cursor-pointer shadow-xs"
+              >
+                <BookOpen className="w-4 h-4" />
+                <span>اختبار علوم التربية (QCM)</span>
+              </button>
+
+              <button
+                type="button"
                 onClick={() => window.print()}
                 className="w-full sm:w-auto px-6 py-3 bg-slate-100 hover:bg-slate-200 text-slate-800 rounded-xl text-xs sm:text-sm font-semibold transition-colors flex items-center justify-center gap-2 cursor-pointer"
               >
                 <Printer className="w-4 h-4" />
                 <span>طباعة التقرير</span>
-              </button>
-
-              <button
-                type="button"
-                onClick={onOpenRegions}
-                className="w-full sm:w-auto px-6 py-3 bg-emerald-50 hover:bg-emerald-100 text-emerald-800 rounded-xl text-xs sm:text-sm font-semibold transition-colors flex items-center justify-center gap-2 cursor-pointer"
-              >
-                <Compass className="w-4 h-4" />
-                <span>دليل الأكاديميات (AREF)</span>
               </button>
             </div>
           </div>
